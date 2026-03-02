@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complaint Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-style.css') }}">
+</head>
+<body>
+
+<header>
+    <div class="logo">SLFD System - Admin Panel</div>
+</header>
+
+<div class="container">
+    <h2>Complaint Management</h2>
+
+    <table border="1" cellspacing="0" cellpadding="8">
+        <tr>
+     <th>id</th>
+     <th>phone</th>
+     <th>post_id</th>
+     <th>Area</th>
+     <th>cnn result</th>
+     <th>confidence percentage</th>
+     <th>Fault1</th>
+       <th>Fault2</th>  
+       <th>Fault3</th>
+       <th>Suggestion</th>
+       <th>Image</th>
+       <th>Employee name</th>
+       <th>Status</th>
+       <th>Action</th>
+        </tr>
+
+        {% for complaint in complaints %}
+        <tr>
+
+            <td>{{ complaint.id }}</td>
+            <td>{{ complaint.phone }}</td>
+            <td>{{ complaint.post_id }}</td>
+            <td>{{ complaint.area }}</td>
+            <td>{{ complaint.cnn_result }}</td>
+            <td>{{ complaint.confidence }}</td>
+            <td>{{ complaint.fault1 }}</td>
+            <td>{{ complaint.fault2 }}</td>
+            <td>{{ complaint.fault3 }}</td>
+            <td>{{ complaint.suggestion }}</td>
+
+           
+            <td>
+    <img src="{{ url_for('static', filename=complaint.image_path) }}"
+         width="80"
+         height="80"
+         style="object-fit:cover;">
+</td>
+
+            <form action="{{ url_for('update_complaint', id=complaint.id) }}" method="POST">
+                <td>
+                    <select name="employee_name">
+                        <option value="Ravi" {% if complaint.employee_name=='Ravi' %}selected{% endif %}>Ravi</option>
+                        <option value="Arun" {% if complaint.employee_name=='Arun' %}selected{% endif %}>Arun</option>
+                        <option value="Suresh" {% if complaint.employee_name=='Suresh' %}selected{% endif %}>Suresh</option>
+                    </select>
+                </td>
+
+                <td>
+                    <select name="status">
+                        <option value="Pending" {% if complaint.status=='Pending' %}selected{% endif %}>Pending</option>
+                        <option value="Resolved" {% if complaint.status=='Resolved' %}selected{% endif %}>Resolved</option>
+                    </select>
+                </td>
+
+                <td>
+                    <button type="submit">Update</button>
+                    <a href="{{ url_for('delete_complaint', id=complaint.id) }}"
+                       onclick="return confirm('Are you sure?')">
+                       Delete
+                    </a>
+                </td>
+            </form>
+
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+</body>
+</html>

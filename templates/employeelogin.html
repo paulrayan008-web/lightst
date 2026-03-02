@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/employee.css') }}">
+</head>
+<body>
+
+<header>
+    <div class="logo">SLFD System - Employee</div>
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <h2>Employee Login</h2>
+
+        <!-- FORM START -->
+        <form method="POST" action="{{ url_for('employee_login') }}">
+
+            <input type="email"
+                   name="email"
+                   placeholder="Email Address"
+                   required>
+
+            <input type="password"
+                   name="password"
+                   placeholder="Password"
+                   required>
+
+            <button type="submit" class="primary-btn">Login</button>
+
+        </form>
+        <!-- FORM END -->
+
+        <p class="link-text">
+            <a href="{{ url_for('employee_register') }}">New Employee?</a>
+        </p>
+
+    </div>
+
+</div>
+
+</body>
+</html>

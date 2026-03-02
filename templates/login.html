@@ -1,0 +1,78 @@
+
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Login - SLFD</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+
+<header>
+    <h1>Street Light Fault Detection</h1>
+</header>
+
+<section class="login-section">
+    <div class="login-card">
+
+        <h2>User Login</h2>
+        <p>Enter your mobile number to receive OTP</p>
+
+        <form method="POST">
+
+            <!-- Phone -->
+            <div class="input-group">
+                <label>Mobile Number</label>
+                <input type="text"
+                       name="phone"
+                       value="{{ phone if phone else '' }}"
+                       placeholder="Enter 10 Digit Number"
+                       maxlength="10"
+                       pattern="[0-9]{10}"
+                       {% if otp_sent %} readonly {% endif %}
+                       required>
+            </div>
+
+            <!-- Send OTP -->
+            <button type="submit"
+                    name="action"
+                    value="send_otp"
+                    class="btn primary">
+                Send OTP
+            </button>
+
+            <!-- OTP Field (Visible only after send) -->
+            {% if otp_sent %}
+            <div class="input-group">
+                <label>Enter OTP</label>
+                <input type="text"
+                       name="entered_otp"
+                       placeholder="Enter OTP"
+                       maxlength="6"
+                       required>
+            </div>
+
+            <button type="submit"
+                    name="action"
+                    value="verify_otp"
+                    class="btn success">
+                Verify OTP
+            </button>
+            {% endif %}
+
+            <!-- Error Message -->
+            {% if error %}
+            <p class="error">{{ error }}</p>
+            {% endif %}
+
+        </form>
+
+    </div>
+</section>
+
+<footer>
+    © 2026 Street Light Fault Detection Using Image Analysis
+</footer>
+
+</body>
+</html>

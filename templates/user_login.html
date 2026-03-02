@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Street Light Fault Detection</title>
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+<body>
+
+<header>
+    <nav>
+        <div class="logo">SLFD System</div>
+        <ul>
+    <li><a href="{{ url_for('home') }}">Home</a></li>
+    <li><a href="{{ url_for('employee_login') }}">Employee</a></li>
+    <li><a href="{{ url_for('admin_dashboard') }}">Admin</a></li>
+    <li><a href="{{ url_for('user') }}">Login</a></li>
+</ul>
+
+    </nav>
+</header>
+
+<section class="hero">
+
+    <div class="hero-content">
+        <h1>Street Light Fault Detection<br>Using Image Analysis</h1>
+
+        <p>
+            A Smart Complaint Management System that allows citizens to report 
+            street light faults using image capture and automatic pole ID detection.
+        </p>
+
+        <div class="buttons">
+            <a href="{{ url_for('user') }}" class="btn-primary">Report Complaint</a>
+            <a href="#" class="btn-secondary">Learn More</a>
+        </div>
+    </div>
+
+</section>
+
+<section class="features">
+
+    <div class="feature-card">
+        <h3>📸 Image Based Detection</h3>
+        <p>Detect street light post ID automatically from captured image using AI.</p>
+    </div>
+
+    <div class="feature-card">
+        <h3>👨‍🔧 Area Based Assignment</h3>
+        <p>Complaints are assigned automatically to the correct area employee.</p>
+    </div>
+
+    <div class="feature-card">
+        <h3>📊 Real-Time Monitoring</h3>
+        <p>Admin dashboard to monitor and track all complaint statuses.</p>
+    </div>
+
+</section>
+
+<footer>
+    <p>© 2026 Street Light Fault Detection System | Final Year Project</p>
+</footer>
+
+</body>
+</html>

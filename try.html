@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Street Light Complaint</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/complaint.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <h2>Street Light Complaint Registration</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        <!-- POST ID -->
+        <label>Post ID</label>
+        <input type="text" name="post_id" placeholder="Enter Post ID" required>
+        <br><br>
+
+        {% if area %}
+            <p><strong>Area:</strong> {{ area }}</p>
+            <p><strong>Assigned Employee:</strong> {{ employee_name }}</p>
+        {% endif %}
+
+        <!-- CAMERA SECTION -->
+        <h3>Live Camera</h3>
+        <video id="camera" width="300" autoplay></video>
+        <br>
+        <button type="button" onclick="captureImage()">Capture Image</button>
+
+        <canvas id="canvas" style="display:none;"></canvas>
+        <br>
+        <img id="preview" width="300">
+        <input type="hidden" name="captured_image" id="captured_image">
+
+        <hr>
+
+        <!-- UPLOAD SECTION -->
+        <h3>Or Upload Image</h3>
+        <input type="file" name="image" accept="image/*" onchange="previewUpload(event)">
+        <br><br>
+        <img id="upload_preview" width="300">
+
+        <hr>
+
+        <!-- FAULT SELECTION -->
+        <h3>Select Faults</h3>
+        <label><input type="checkbox" name="fault1" value="Broken Light"> Broken Light</label><br>
+        <label><input type="checkbox" name="fault2" value="Flickering"> Flickering</label><br>
+        <label><input type="checkbox" name="fault3" value="Pole Damage"> Pole Damage</label><br>
+
+        <br>
+
+        <!-- SUGGESTION -->
+        <textarea name="suggestion" placeholder="Enter Suggestion"></textarea>
+
+        <br><br>
+
+        <button type="submit">Submit Complaint</button>
+
+    </form>
+
+    <!-- AI RESULT -->
+    {% if fault %}
+        <hr>
+        <h3>AI Detection Result</h3>
+        <p><strong>Status:</strong> {{ fault }}</p>
+        <p><strong>Confidence:</strong> {{ confidence }}%</p>
+        <img src="{{ image_path }}" width="300">
+    {% endif %}
+
+    {% if success %}
+        <script>alert("{{ success }}");</script>
+    {% endif %}
+
+</div>
+
+<script>
+// START CAMERA
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(stream => {
+    document.getElementById('camera').srcObject = stream;
+})
+.catch(error => {
+    alert("Camera not supported or permission denied!");
+});
+
+// CAPTURE IMAGE
+function captureImage() {
+
+    let video = document.getElementById('camera');
+    let canvas = document.getElementById('canvas');
+    let context = canvas.getContext('2d');
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    context.drawImage(video, 0, 0);
+
+    let imageData = canvas.toDataURL("image/png");
+
+    document.getElementById('captured_image').value = imageData;
+    document.getElementById('preview').src = imageData;
+
+    alert("Image Captured Successfully!");
+}
+
+// UPLOAD PREVIEW
+function previewUpload(event) {
+    let reader = new FileReader();
+    reader.onload = function(){
+        document.getElementById('upload_preview').src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+</script>
+
+</body>
+</html>

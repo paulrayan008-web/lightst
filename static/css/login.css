@@ -1,0 +1,191 @@
+:root {
+    --main-color: #0d6efd;
+    --dark-blue: #0a58ca;
+}
+
+/* RESET */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* ANIMATED BACKGROUND */
+
+body {
+    height: 100vh;
+    background: linear-gradient(-45deg, #0d6efd, #1e90ff, #0a58ca, #00c6ff);
+    background-size: 400% 400%;
+    animation: gradientMove 10s ease infinite;
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* HEADER */
+
+header {
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(10px);
+    padding: 15px 50px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    text-shadow: 0 0 15px #00eaff;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+}
+
+nav ul li {
+    margin-left: 25px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: white;
+    transition: 0.3s;
+}
+
+nav ul li a:hover {
+    color: #00eaff;
+    transform: scale(1.1);
+}
+
+/* LOGIN SECTION */
+
+.login-section {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* GLASS LOGIN CARD */
+
+.login-card {
+    width: 380px;
+    padding: 35px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px);
+    box-shadow: 
+        0 15px 40px rgba(0,0,0,0.5),
+        0 0 30px rgba(13,110,253,0.5);
+    text-align: center;
+    color: white;
+    animation: fadeIn 1.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.login-card h2 {
+    margin-bottom: 10px;
+    color: #ffffff;
+    text-shadow: 0 0 10px #00eaff;
+}
+
+.login-card p {
+    font-size: 14px;
+    color: #e0f7ff;
+    margin-bottom: 20px;
+}
+
+/* INPUTS */
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    transition: 0.3s;
+}
+
+input::placeholder {
+    color: #e0f7ff;
+}
+
+input:focus {
+    box-shadow: 0 0 15px #00eaff;
+}
+
+/* BUTTONS */
+
+.primary-btn,
+.secondary-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+    letter-spacing: 1px;
+}
+
+/* SEND OTP BUTTON */
+
+.primary-btn {
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    color: white;
+    box-shadow: 0 0 20px rgba(0,191,255,0.6);
+}
+
+.primary-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 35px rgba(0,191,255,0.9);
+}
+
+/* VERIFY OTP BUTTON */
+
+.secondary-btn {
+    background: linear-gradient(90deg, #00ffcc, #00ccff);
+    color: black;
+    margin-top: 8px;
+    box-shadow: 0 0 20px rgba(0,255,200,0.6);
+}
+
+.secondary-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 35px rgba(0,255,200,1);
+}
+
+.otp-box {
+    margin-top: 10px;
+}
+
+/* FOOTER */
+
+footer {
+    background: rgba(0,0,0,0.4);
+    text-align: center;
+    padding: 12px;
+    color: white;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+}

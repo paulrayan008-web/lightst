@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-style.css') }}">
+
+</head>
+<body>
+
+<header>
+    <div class="logo">SLFD System - Admin Panel</div>
+</header>
+
+<div class="dashboard">
+
+    <div class="card">
+        <h3>Total Complaints</h3>
+        <p>25</p>
+    </div>
+
+    <div class="card">
+        <h3>Pending Complaints</h3>
+        <p>10</p>
+    </div>
+
+    <div class="card">
+        <h3>Resolved Complaints</h3>
+        <p>15</p>
+    </div>
+
+    <div class="card">
+        <h3>Total Employees</h3>
+        <p>5</p>
+    </div>
+
+</div>
+
+<div class="nav-links">
+
+    <a href="{{ url_for('admin_employees') }}">Manage Employees</a> 
+    <a href="{{ url_for('admin_complaints') }}">Manage Complaints</a> 
+
+
+</div>
+
+</body>
+</html>

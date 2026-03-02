@@ -1,0 +1,201 @@
+:root {
+    --main-color: #0d6efd;
+    --dark-blue: #0a58ca;
+}
+
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* ANIMATED BACKGROUND */
+body {
+    height: 100vh;
+    background: linear-gradient(-45deg, #0d6efd, #00c6ff, #0a58ca, #1e90ff);
+    background-size: 400% 400%;
+    animation: gradientBG 12s ease infinite;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* HEADER */
+header {
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(10px);
+    padding: 15px 50px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+}
+
+.logo {
+    color: white;
+    font-weight: bold;
+    font-size: 22px;
+    text-shadow: 0 0 10px #00eaff;
+}
+
+/* COMMON CONTAINER */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 85vh;
+}
+
+/* GLASS CARD */
+.card {
+    width: 400px;
+    padding: 35px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px);
+    box-shadow: 
+        0 15px 35px rgba(0,0,0,0.4),
+        0 0 30px rgba(13,110,253,0.6);
+    text-align: center;
+    color: white;
+    animation: fadeUp 1s ease;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.card h2 {
+    margin-bottom: 20px;
+    color: white;
+    text-shadow: 0 0 10px #00eaff;
+}
+
+/* INPUTS */
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    transition: 0.3s;
+}
+
+input::placeholder {
+    color: #e0f7ff;
+}
+
+input:focus, select:focus {
+    box-shadow: 0 0 15px #00eaff;
+}
+
+/* BUTTON */
+.primary-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 0 20px rgba(0,191,255,0.7);
+}
+
+.primary-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 35px rgba(0,191,255,1);
+}
+
+/* LINKS */
+.link-text {
+    margin-top: 15px;
+}
+
+.link-text a {
+    color: #00eaff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.link-text a:hover {
+    text-decoration: underline;
+}
+
+/* DASHBOARD */
+.dashboard-container {
+    padding: 40px;
+    animation: fadeUp 1s ease;
+}
+
+.dashboard-container h2 {
+    margin-bottom: 20px;
+    color: white;
+    text-shadow: 0 0 10px #00eaff;
+}
+
+/* GLASS TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 15px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px);
+    box-shadow: 
+        0 10px 30px rgba(0,0,0,0.4),
+        0 0 25px rgba(13,110,253,0.6);
+    color: white;
+}
+
+/* TABLE CELLS */
+th, td {
+    padding: 14px;
+    text-align: center;
+}
+
+th {
+    background: rgba(0,0,0,0.4);
+    text-shadow: 0 0 8px #00eaff;
+}
+
+tr:nth-child(even) {
+    background: rgba(255,255,255,0.05);
+}
+
+/* STATUS COLORS */
+.pending {
+    color: #ff4d4d;
+    font-weight: bold;
+    text-shadow: 0 0 5px red;
+}
+
+.resolved {
+    color: #00ff99;
+    font-weight: bold;
+    text-shadow: 0 0 8px #00ff99;
+}
+
+/* RESOLVE BUTTON */
+.resolve-btn {
+    padding: 6px 14px;
+    background: linear-gradient(90deg, #00ffcc, #00ccff);
+    color: black;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.resolve-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px #00ffff;
+}

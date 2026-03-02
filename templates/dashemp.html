@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/employee.css') }}">
+</head>
+<body>
+
+<header>
+    <div class="logo">SLFD System - Employee</div>
+</header>
+
+<div class="dashboard-container">
+
+    <h2>My Assigned Area: {{ area }}</h2>
+
+    <h2>Employee Dashboard</h2>
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Area</th>
+        <th>cnn result</th>
+     <th>confidence percentage</th>
+     <th>Fault1</th>
+       <th>Fault2</th>  
+       <th>Fault3</th>
+       <th>Suggestion</th>
+       <th>Image</th>
+    
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+
+    {% for c in complaints %}
+    <tr>
+        <td>{{ c.id }}</td>
+        <td>{{ c.area }}</td>
+        <td>{{ c.cnn_result }}</td>
+            <td>{{ c.confidence }}</td>
+            <td>{{ c.fault1 }}</td>
+            <td>{{ c.fault2 }}</td>
+            <td>{{ c.fault3 }}</td>
+            <td>{{ c.suggestion }}</td>
+             <td>
+    <img src="{{ url_for('static', filename=c.image_path) }}"
+         width="80"
+         height="80"
+         style="object-fit:cover;">
+</td> 
+        <td>{{ c.status }}</td>
+        <td>
+            <a href="{{ url_for('mark_resolved', id=c.id) }}">
+                Mark Resolved
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+</div>
+
+</body>
+</html>
