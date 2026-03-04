@@ -67,6 +67,10 @@
         <p><strong>Status:</strong> {{ fault }}</p>
         <p><strong>Confidence:</strong> {{ confidence }}%</p>
         <img src="{{ image_path }}" width="300">
+        <br><br>
+   <a href="{{ url_for('generate_report', id=id) }}">
+    <button type="button">Generate Report</button>
+</a>
     {% endif %}
 
     {% if success %}
@@ -159,6 +163,11 @@ function compressUpload(event) {
     reader.readAsDataURL(file);
 }
 </script>
+{% if error %}
+<script>
+    alert("{{ error }}");
+</script>
+{% endif %}
 
 </body>
 </html>

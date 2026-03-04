@@ -3,12 +3,18 @@ import requests
 import torch
 import torch.nn as nn
 from PIL import Image, ImageEnhance
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session,flash
 from torchvision import transforms
 import torch.optim as optim
 from torchvision import models, transforms
 from werkzeug.exceptions import RequestEntityTooLarge
 import mysql.connector
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image as RLImage
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase import pdfmetrics
 
 # =============================
 # CONFIGURATION
@@ -130,7 +136,7 @@ transform = transforms.Compose([
 
 
 # ⚠ MUST MATCH training order
-class_names = ["low", "off", "on", "physical"]
+class_names = ["low", "Light_of", "Light_on", "physical"]
 
 # =============================
 # ROUTES
@@ -262,9 +268,15 @@ def predict_analysis():
 
     fault = class_names[predicted.item()]
     confidence_score = round(confidence.item() * 100, 2)
+    if confidence < 0:
+        return render_template(
+            "complaint.html",
+              error="Invalid Image! Please upload a clear streetlight image."
+            )
 
-    print("Prediction:", fault)
-    print("Confidence:", confidence_score, "%")
+    # print("Prediction:", fault)
+    # print("Confidence:", confidence_score, "%")
+    
 
     # ======================================
     # USER INPUT
@@ -292,6 +304,8 @@ def predict_analysis():
     ))
 
     db.commit()
+    complaint_id = cursor.lastrowid   # this gets the id column value
+
     db.close()
 
     return render_template(
@@ -301,7 +315,9 @@ def predict_analysis():
         confidence=confidence_score,
         area=area,
         employee_name=employee_name,
-        image_path=url_for("static", filename="uploads/" + filename)
+        image_path=url_for("static", filename="uploads/" + filename),
+        id=complaint_id   # ✅ PASS id
+
     )
 
 # -----------------------------
@@ -405,13 +421,52 @@ def mark_resolved(id):
 # -----------------------------
 # ADMIN LOGIN / DASHBOARD
 # -----------------------------
-@app.route('/admin')
+@app.route('/admin_login', methods=['GET', 'POST'])
 def admin_login():
-    return render_template('adminlogin.html')
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        # Default credentials (NO DATABASE)
+        if username == "admin" and password == "admin123":
+            return redirect(url_for('admin_dashboard'))
+        else:
+            flash("Invalid Username or Password!")
+
+    return render_template('admin_login.html')
+#dashboard
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
-    return render_template('dashboard.html')
+    db = get_db_connection()
+    cursor = db.cursor()
+
+    # Total Complaints
+    cursor.execute("SELECT COUNT(*) FROM complaints")
+    total_complaints = cursor.fetchone()[0]
+
+    # Pending Complaints
+    cursor.execute("SELECT COUNT(*) FROM complaints WHERE status = 'Pending'")
+    pending_complaints = cursor.fetchone()[0]
+
+    # Resolved Complaints
+    cursor.execute("SELECT COUNT(*) FROM complaints WHERE status = 'Resolved'")
+    resolved_complaints = cursor.fetchone()[0]
+
+    # Total Employees
+    cursor.execute("SELECT COUNT(*) FROM employees")
+    total_employees = cursor.fetchone()[0]
+
+    cursor.close()
+    db.close()
+
+    return render_template(
+        'dashboard.html',
+        total_complaints=total_complaints,
+        pending_complaints=pending_complaints,
+        resolved_complaints=resolved_complaints,
+        total_employees=total_employees
+    )
 
 #admin complaints 
 @app.route('/admin_complaints')
@@ -484,11 +539,77 @@ def admin_employees():
     employees = cursor.fetchall()
     db.close()
     return render_template('admin-employees.html', employees=employees)
+#report
+from flask import send_file
+
+@app.route('/generate_report/<int:id>')
+def generate_report(id):
+
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM complaints WHERE id=%s", (id,))
+    complaint = cursor.fetchone()
+    db.close()
+
+    if not complaint:
+        return "Complaint Not Found"
+
+    # Create reports folder
+    reports_folder = os.path.join(app.root_path, "static", "reports")
+    os.makedirs(reports_folder, exist_ok=True)
+
+    pdf_filename = f"complaint_{id}.pdf"
+    pdf_path = os.path.join(reports_folder, pdf_filename)
+
+    # Create PDF
+    doc = SimpleDocTemplate(pdf_path)
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # Title
+    elements.append(Paragraph("Street Light Complaint Report", styles["Heading1"]))
+    elements.append(Spacer(1, 0.5 * inch))
+
+    # Complaint Details
+    elements.append(Paragraph(f"<b>Complaint ID:</b> {complaint.get('id', '')}", styles["Normal"]))
+    elements.append(Paragraph(f"<b>Phone:</b> {complaint.get('phone', '')}", styles["Normal"]))
+    elements.append(Paragraph(f"<b>Post ID:</b> {complaint.get('post_id', '')}", styles["Normal"]))
+    elements.append(Paragraph(f"<b>Area:</b> {complaint.get('area', '')}", styles["Normal"]))
+
+    # User Selected Fault
+    elements.append(Paragraph(f"<b>User Selected Fault:</b> {complaint.get('fault1', '')}", styles["Normal"]))
+    elements.append(Paragraph(f"<b>User Selected Fault:</b> {complaint.get('fault2', '')}", styles["Normal"]))
+    elements.append(Paragraph(f"<b>User Selected Fault:</b> {complaint.get('fault3', '')}", styles["Normal"]))
+
+
+    # CNN Results
+    elements.append(Paragraph(f"<b>CNN Detected Issue:</b> {complaint.get('cnn_result', '')}", styles["Normal"]))
+    elements.append(Paragraph(f"<b>CNN Confidence:</b> {complaint.get('confidence', '')}%", styles["Normal"]))
+
+    # Employee & Status
+    elements.append(Paragraph(f"<b>Assigned Employee:</b> {complaint.get('employee_name', '')}", styles["Normal"]))
+    elements.append(Paragraph(f"<b>Suggestion:</b> {complaint.get('suggestion', '')}", styles["Normal"]))
+    elements.append(Paragraph(f"<b>Status:</b> {complaint.get('status', '')}", styles["Normal"]))
+
+    elements.append(Spacer(1, 0.5 * inch))
+
+    # Add Complaint Image (if exists)
+    if complaint.get('image_path'):
+        image_path = os.path.join(app.root_path, "static", complaint['image_path'])
+
+        if os.path.exists(image_path):
+            elements.append(Paragraph("<b>Complaint Image:</b>", styles["Heading2"]))
+            elements.append(Spacer(1, 0.2 * inch))
+            elements.append(RLImage(image_path, width=4 * inch, height=3 * inch))
+
+    # Build PDF
+    doc.build(elements)
+
+    # Download file
+    return send_file(pdf_path, as_attachment=True)
 
 # =============================
 # RUN APP
 # =============================
 if __name__ == "__main__":
-    if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER)
     app.run(debug=True)
