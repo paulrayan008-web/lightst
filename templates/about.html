@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>About - Street Light Fault Detection</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            color: #333;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 900px;
+            margin: 50px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e3c72;
+        }
+
+        p {
+            line-height: 1.8;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .home-btn {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .home-btn a button {
+            padding: 8px 15px;
+            border: none;
+            background-color: #1e3c72;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .home-btn a button:hover {
+            background-color: #16325c;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="home-btn">
+            <a href="{{ url_for('home') }}">
+                <button type="button">🏠 Home</button>
+            </a>
+        </div>
+
+        <h1>About</h1>
+
+        <p>
+            The Street Light Fault Detection System is developed to automate the process 
+            of identifying street light issues using Convolutional Neural Networks (CNN). 
+            Traditional manual inspection methods require significant time and manpower, 
+            which can delay maintenance and increase operational costs.
+        </p>
+
+        <p>
+            This project enables users to capture or upload images of street lights 
+            through a web-based application. The uploaded image is analyzed using a 
+            trained deep learning model to detect faults such as broken lights, 
+            flickering lights, and pole damage.
+        </p>
+
+        <p>
+            The system provides accurate predictions along with confidence levels, 
+            helping authorities take faster action. It also maintains complaint 
+            records and generates reports for better monitoring and management.
+        </p>
+
+        <p>
+            By integrating artificial intelligence with public infrastructure 
+            management, this project supports smart city initiatives and improves 
+            safety, efficiency, and automation in street light maintenance.
+        </p>
+
+        <footer>
+            © 2026 Street Light Fault Detection System
+        </footer>
+
+    </div>
+
+</body>
+</html>

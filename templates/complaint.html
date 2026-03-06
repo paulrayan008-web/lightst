@@ -11,6 +11,12 @@
     <h2>Street Light Complaint Registration</h2>
 
     <form method="POST" enctype="multipart/form-data">
+        <!-- HOME BUTTON -->
+<div style="text-align:right; margin-bottom:15px;">
+    <a href="{{ url_for('home') }}">
+        <button type="button">🏠 Home</button>
+    </a>
+</div>
 
         <!-- POST ID -->
         <label>Post ID</label>
@@ -68,10 +74,10 @@
         <p><strong>Confidence:</strong> {{ confidence }}%</p>
         <img src="{{ image_path }}" width="300">
         <br><br>
-   <a href="{{ url_for('generate_report', id=id) }}">
+ <a href="{{ url_for('generate_report', id=id) }}">
     <button type="button">Generate Report</button>
 </a>
-    {% endif %}
+ {% endif %}
 
     {% if success %}
         <script>alert("{{ success }}");</script>

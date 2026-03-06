@@ -150,3 +150,19 @@ textarea {
         height: auto;
     }
 }
+.report-btn{
+    display: inline-block;
+    padding: 12px 20px;
+    background: #28a745;
+    color: white;
+    font-size: 16px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.report-btn:hover{
+    background: #218838;
+    transform: scale(1.05);
+}

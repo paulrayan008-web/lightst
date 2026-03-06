@@ -8,13 +8,14 @@ from torchvision import transforms
 import torch.optim as optim
 from torchvision import models, transforms
 from werkzeug.exceptions import RequestEntityTooLarge
-import mysql.connector
+import psycopg2
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image as RLImage
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
+import psycopg2.extras
 
 # =============================
 # CONFIGURATION
@@ -40,14 +41,15 @@ API_KEY = "dbe2bec1-0dbf-11f1-bcb0-0200cd936042"
 # =============================
 
 def get_db_connection():
-    return mysql.connector.connect(
-        host="mysql.railway.internal",
-        user="root",
-        password="QhtOCgWxilFxjsfqLZAAJpyTjZkFutQR",
-        database="railway"
+    return psycopg2.connect(
+        host="db.ohtpdxrtodcdjevqwujd.supabase.co",
+        database="postgres",
+        user="postgres",
+        password="Qi6HqIeoJV7NTJ3R",
+        port="5432"
     )
 
-# @app.errorhandler(RequestEntityTooLarge)
+# @app.errorhaaseityTooLarge)
 # def handle_large_file(e):
 #     return """
 #     <script>
@@ -145,6 +147,9 @@ class_names = ["low", "Light_of", "Light_on", "physical"]
 @app.route('/')
 def home():
     return render_template('user_login.html')
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 # -----------------------------
 # USER LOGIN WITH OTP
@@ -219,8 +224,7 @@ def predict_analysis():
         return "<script>alert('Enter Post ID');window.location='/predict_analysis';</script>"
 
     db = get_db_connection()
-    cursor = db.cursor(dictionary=True)
-
+    cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # Fetch post details
     cursor.execute("SELECT * FROM post WHERE post_id=%s", (post_id,))
     post_data = cursor.fetchone()
@@ -268,7 +272,7 @@ def predict_analysis():
 
     fault = class_names[predicted.item()]
     confidence_score = round(confidence.item() * 100, 2)
-    if confidence < 0:
+    if confidence <0:
         return render_template(
             "complaint.html",
               error="Invalid Image! Please upload a clear streetlight image."
@@ -293,8 +297,8 @@ def predict_analysis():
         INSERT INTO complaints
         (phone, post_id, area, employee_name, cnn_result, confidence,
          fault1, fault2, fault3, suggestion, image_path, status)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-    """, (
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)    RETURNING id
+    """  , (
         phone, post_id, area, employee_name,
         fault, confidence_score,
         fault1, fault2, fault3,
@@ -304,9 +308,10 @@ def predict_analysis():
     ))
 
     db.commit()
-    complaint_id = cursor.lastrowid   # this gets the id column value
+    complaint_id = cursor.fetchone()[0]  # this gets the id column value
 
     db.close()
+   
 
     return render_template(
         "complaint.html",
@@ -330,7 +335,7 @@ def employee_login():
         password = request.form["password"]
 
         db = get_db_connection()
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute("SELECT * FROM employees WHERE email=%s AND password=%s",
                        (email,password))
         employee = cursor.fetchone()
@@ -386,7 +391,7 @@ def employee_dashboard():
         return redirect("/employee_login")
 
     db = get_db_connection()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     cursor.execute("""
         SELECT * FROM complaints
@@ -472,15 +477,9 @@ def admin_dashboard():
 @app.route('/admin_complaints')
 def admin_complaints():
 
-    db = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="light",
-        database="streetlight_db"
-    )
+    db = get_db_connection()
+    cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-   
-    cursor = db.cursor(dictionary=True)
     cursor.execute("SELECT * FROM complaints")
     complaints = cursor.fetchall()
 
@@ -494,13 +493,9 @@ def update_complaint(id):
     employee_name = request.form['employee_name']
     status = request.form['status']
 
-    db = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="light",
-        database="streetlight_db"
-    )
-    cursor = db.cursor()
+    
+    db = get_db_connection()
+    cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     cursor.execute("""
         UPDATE complaints 
@@ -517,13 +512,9 @@ def update_complaint(id):
 @app.route('/delete_complaint/<int:id>')
 def delete_complaint(id):
 
-    db = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="light",
-        database="streetlight_db"
-    )
-    cursor = db.cursor()
+   
+    db = get_db_connection()
+    cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     cursor.execute("DELETE FROM complaints WHERE id=%s", (id,))
     db.commit()
@@ -532,28 +523,87 @@ def delete_complaint(id):
     db.close()
 
     return redirect(url_for('admin_complaints'))
+#employee management
 @app.route('/admin_employees')
 def admin_employees():
     db = get_db_connection()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute("SELECT * FROM employees")
     employees = cursor.fetchall()
     db.close()
     return render_template('admin-employees.html', employees=employees)
+# ---------------- VIEW ----------------
+@app.route("/view_employees")
+def view_employees():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM employees")
+    employees = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return render_template("view_employees.html", employees=employees)
+
+# ---------------- DELETE ----------------
+@app.route("/delete/<int:id>")
+def delete_employee(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM employees WHERE id=%s", (id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return redirect(url_for("view_employees"))
+
+# ---------------- EDIT ----------------
+@app.route("/edit/<int:id>", methods=["GET", "POST"])
+def edit_employee(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    if request.method == "POST":
+        name = request.form["name"]
+        email = request.form["email"]
+        phone = request.form["phone"]
+        area = request.form["area"]
+
+        cursor.execute("""
+            UPDATE employees 
+            SET name=%s, email=%s, phone=%s, area=%s 
+            WHERE id=%s
+        """, (name, email, phone, area, id))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return redirect(url_for("view_employees"))
+
+    cursor.execute("SELECT * FROM employees WHERE id=%s", (id,))
+    employee = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    return render_template("edit_employee.html", emp=employee)
 #report
 from flask import send_file
-
 @app.route('/generate_report/<int:id>')
 def generate_report(id):
 
     db = get_db_connection()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
     cursor.execute("SELECT * FROM complaints WHERE id=%s", (id,))
     complaint = cursor.fetchone()
+
+    cursor.close()
     db.close()
 
-    if not complaint:
-        return "Complaint Not Found"
+    if complaint is None:
+        return f"Complaint ID {id} Not Found"
+
+    # continue PDF code...
 
     # Create reports folder
     reports_folder = os.path.join(app.root_path, "static", "reports")

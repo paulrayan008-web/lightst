@@ -1,45 +1,33 @@
-{% comment %} <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Manage Employees</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-style.css') }}">
-
-
+    <title>Employee Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style1.css') }}">
 </head>
 <body>
-
-<header>
-    <div class="logo">SLFD System - Admin Panel</div>
-</header>
+      <div style="text-align:right; margin-bottom:25px;">
+    <a href="{{ url_for('admin_dashboard') }}">
+        <button type="button">Back</button>
+    </a>
+</div>
 
 <div class="container">
+    <h1>Employee Management Dashboard</h1>
 
-    <h2>Employee Management</h2>
+    <div class="card-container">
+        <div class="card">
+            <a href="{{ url_for('employee_register') }}">
+                ➕ Employee Register
+            </a>
+        </div>
 
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>Working Area</th>
-            <th>Status</th>
-        </tr>
-
-        <tr>
-            <td>Ravi</td>
-            <td>9876543210</td>
-            <td>Rajiv Nagar</td>
-            <td>Active</td>
-        </tr>
-
-        <tr>
-            <td>Arun</td>
-            <td>9876500011</td>
-            <td>City Center</td>
-            <td>Active</td>
-        </tr>
-    </table>
-
+        <div class="card">
+            <a href="{{ url_for('view_employees') }}">
+                📋 View Employees
+            </a>
+        </div>
+    </div>
 </div>
 
 </body>
-</html> {% endcomment %}
+</html>

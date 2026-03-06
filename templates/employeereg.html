@@ -5,6 +5,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/employee.css') }}">
 </head>
 <body>
+     <div style="text-align:right; margin-bottom:35px;">
+    <a href="{{ url_for('admin_employees') }}">
+        <button type="button">Back</button>
+    </a>
+</div>
 
 <div class="container">
     <div class="card">
@@ -32,11 +37,6 @@
 
         </form>
 
-        <p>
-             <a href="{{ url_for('employee_login') }}"> 
-                Already have an account?
-            </a> 
-        </p>
 
     </div>
 </div>
