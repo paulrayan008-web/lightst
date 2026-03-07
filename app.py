@@ -44,15 +44,17 @@ API_KEY = "dbe2bec1-0dbf-11f1-bcb0-0200cd936042"
 # DATABASE CONNECTION
 # =============================
 
+# def get_db_connection():
+#     return psycopg2.connect(
+#         host="aws-1-ap-south-1.pooler.supabase.com",
+#         database="postgres",
+#         user="postgres.ohtpdxrtodcdjevqwujd",
+#         password="Qi6HqIeoJV7NTJ3R",
+#         port="5432",
+#         sslmode="require"
+#     )
 def get_db_connection():
-    return psycopg2.connect(
-        host="aws-1-ap-south-1.pooler.supabase.com",
-        database="postgres",
-        user="postgres.ohtpdxrtodcdjevqwujd",
-        password="Qi6HqIeoJV7NTJ3R",
-        port="5432",
-        sslmode="require"
-    )
+    return psycopg2.connect(os.environ.get("postgresql://postgres:[Qi6HqIeoJV7NTJ3R]@db.ohtpdxrtodcdjevqwujd.supabase.co:5432/postgres"))
 
 # @app.errorhaaseityTooLarge)
 # def handle_large_file(e):
