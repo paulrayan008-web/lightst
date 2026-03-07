@@ -29,8 +29,11 @@ app.config['MAX_CONTENT_LENGTH'] = 1000 * 1024 * 1024  # 500MB ALLOWED
 
 app.secret_key = "streetlight_secret_key"
 
+# UPLOAD_FOLDER = 'static/uploads'
+# app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
  # ✅ Store this in DB
 # app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500MB ALLOWED
 
