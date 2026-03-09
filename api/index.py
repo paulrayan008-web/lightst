@@ -31,8 +31,9 @@ app.secret_key = "streetlight_secret_key"
 
 # UPLOAD_FOLDER = 'static/uploads'
 # app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-UPLOAD_FOLDER = 'static/uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# UPLOAD_FOLDER = 'static/uploads'
+UPLOAD_FOLDER = os.path.join(os.getcwd(), "static", "uploads")
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
  # ✅ Store this in DB
 # app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500MB ALLOWED
@@ -43,16 +44,29 @@ API_KEY = "dbe2bec1-0dbf-11f1-bcb0-0200cd936042"
 # =============================
 # DATABASE CONNECTION
 # =============================
+# =============================
+# DATABASE CONNECTION
+# =============================
 
 def get_db_connection():
     return psycopg2.connect(
-        host="aws-1-ap-south-1.pooler.supabase.com",
-        database="postgres",
-        user="postgres.ohtpdxrtodcdjevqwujd",
-        password="Qi6HqIeoJV7NTJ3R",
-        port="5432",
+        host=os.environ.get("DB_HOST"),
+        database=os.environ.get("DB_NAME"),
+        user=os.environ.get("DB_USER"),
+        password=os.environ.get("DB_PASS"),
+        port=os.environ.get("DB_PORT"),
         sslmode="require"
     )
+
+# def get_db_connection():
+#     return psycopg2.connect(
+#         host="aws-1-ap-south-1.pooler.supabase.com",
+#         database="postgres",
+#         user="postgres.ohtpdxrtodcdjevqwujd",
+#         password="Qi6HqIeoJV7NTJ3R",
+#         port="5432",
+#         sslmode="require"
+#     )
 # def get_db_connection():
 #     return psycopg2.connect(os.environ.get("postgresql://postgres:[Qi6HqIeoJV7NTJ3R]@db.ohtpdxrtodcdjevqwujd.supabase.co:5432/postgres"))
 
@@ -129,18 +143,27 @@ class CNN(nn.Module):
 
 # ✅ Load NEW MODEL
 model = CNN().to(device)
-model.load_state_dict(torch.load("streetlight_multiclass.pth", map_location=device))
+MODEL_PATH = os.path.join(os.getcwd(), "streetlight_multiclass.pth")
+model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
 model.eval()
 
+# transform = transforms.Compose([
+#     transforms.Resize((128,128)),
+#     # transforms.RandomHorizontalFlip(),
+#     # transforms.RandomRotation(10),
+#     transforms.ColorJitter(brightness=0.3, contrast=0.3),
+#     transforms.ToTensor(),
+#     transforms.Normalize(
+#         mean=[0.485, 0.456, 0.406],
+#         std=[0.229, 0.224, 0.225]
+#     )
+# ])
 transform = transforms.Compose([
     transforms.Resize((128,128)),
-    transforms.RandomHorizontalFlip(),
-    transforms.RandomRotation(10),
-    transforms.ColorJitter(brightness=0.3, contrast=0.3),
     transforms.ToTensor(),
     transforms.Normalize(
-        mean=[0.485, 0.456, 0.406],
-        std=[0.229, 0.224, 0.225]
+        mean=[0.485,0.456,0.406],
+        std=[0.229,0.224,0.225]
     )
 ])
 
@@ -698,5 +721,5 @@ def generate_report(id):
 # =============================
 # RUN APP
 # =============================
-if __name__ == "__main__":
-    app.run(debug=True)
+def handler(request):
+    return app
