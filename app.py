@@ -48,9 +48,8 @@ def get_db_connection():
     return psycopg2.connect(
         host="aws-1-ap-south-1.pooler.supabase.com",
         database="postgres",
-        user="postgres.ohtpdxrtodcdjevqwujd",
         password="Qi6HqIeoJV7NTJ3R",
-        port="6543",
+        port="5432",
         user="postgres.ohtpdxrtodcdjevqwujd",
 
         sslmode="require"
