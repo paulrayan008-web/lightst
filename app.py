@@ -103,71 +103,51 @@ class_names = ["low","Light_of","Light_on","physical"]
 # ROUTES
 # =============================
 
-@app.route('/')
-def home():
-    return render_template("user_login.html")
-
-
-@app.route('/about')
-def about():
-    return render_template("about.html")
-
-
-# =============================
-# USER LOGIN OTP
-# =============================
-
-@app.route('/user',methods=['GET','POST'])
+# -----------------------------
+# USER LOGIN WITH OTP
+# -----------------------------
+@app.route('/user', methods=['GET', 'POST'])
 def user():
+    phone = session.get('verified_phone')
+    otp_sent = False
+    error = None
 
-    otp_sent=False
-    error=None
+    if request.method == 'POST':
+        action = request.form.get('action')
 
-    if request.method=="POST":
-
-        action=request.form.get("action")
-
-        if action=="send_otp":
-
-            phone=request.form.get("phone")
-
-            if phone and phone.isdigit() and len(phone)==10:
-
-                url=f"https://2factor.in/API/V1/{API_KEY}/SMS/{phone}/AUTOGEN/SLFD_OTP"
-                response=requests.get(url)
-                data=response.json()
-
-                if data["Status"]=="Success":
-
-                    session["phone"]=phone
-                    session["session_id"]=data["Details"]
-                    otp_sent=True
-
+        if action == "send_otp":
+            phone = request.form.get('phone')
+            if phone and phone.isdigit() and len(phone) == 10:
+                url = f"https://2factor.in/API/V1/{API_KEY}/SMS/{phone}/AUTOGEN/SLFD_OTP"
+                response = requests.get(url)
+                data = response.json()
+                if data["Status"] == "Success":
+                    session['phone'] = phone
+                    session['session_id'] = data["Details"]
+                    otp_sent = True
                 else:
-                    error="OTP Failed"
-
+                    error = "Failed to send OTP"
             else:
-                error="Enter valid phone"
+                error = "Enter valid 10 digit number"
 
-        elif action=="verify_otp":
-
-            entered=request.form.get("entered_otp")
-            session_id=session.get("session_id")
-
-            url=f"https://2factor.in/API/V1/{API_KEY}/SMS/VERIFY/{session_id}/{entered}"
-            response=requests.get(url)
-            data=response.json()
-
-            if data["Status"]=="Success":
-
-                session["verified_phone"]=session.get("phone")
-                return redirect("/predict_analysis")
-
+        elif action == "verify_otp":
+            entered_otp = request.form.get('entered_otp')
+            session_id = session.get('session_id')
+            if session_id:
+                url = f"https://2factor.in/API/V1/{API_KEY}/SMS/VERIFY/{session_id}/{entered_otp}"
+                response = requests.get(url)
+                data = response.json()
+                if data["Status"] == "Success":
+                    session['verified_phone'] = session.get('phone')
+                    return redirect(url_for('predict_analysis'))
+                else:
+                    otp_sent = True
+                    phone = session.get('phone')
+                    error = "Invalid OTP"
             else:
-                error="Invalid OTP"
-                otp_sent=True
+                error = "Session expired. Try again."
 
-    return render_template("login.html",otp_sent=otp_sent,error=error)
+    return render_template("login.html", otp_sent=otp_sent, error=error)
 
 
 # =============================
