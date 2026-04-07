@@ -89,65 +89,159 @@ device = torch.device("cpu")
 
 # model = model.to(device)
 
+# class CNN(nn.Module):
+#     def __init__(self):
+#         super(CNN, self).__init__()
+
+#         self.conv = nn.Sequential(
+#             nn.Conv2d(3, 32, 3, padding=1),
+#             nn.ReLU(),
+#             nn.MaxPool2d(2),
+
+#             nn.Conv2d(32, 64, 3, padding=1),
+#             nn.ReLU(),
+#             nn.MaxPool2d(2),
+
+#             nn.Conv2d(64, 128, 3, padding=1),
+#             nn.ReLU(),
+#             nn.MaxPool2d(2),
+
+#             nn.AdaptiveAvgPool2d((1,1))
+#         )
+
+#         # self.fc = nn.Sequential(
+#         #     nn.Flatten(),
+#         #     nn.Linear(128, 128),
+#         #     nn.ReLU(),
+#         #     nn.Dropout(0.5),
+#         #     nn.Linear(128, 4)
+#         # )
+#         self.fc = nn.Sequential(
+#             nn.Flatten(),
+#             nn.Linear(128, 128),
+#             nn.ReLU(),
+#             nn.Linear(128, 4)
+#         )
+
+#     def forward(self, x):
+#         x = self.conv(x)
+#         x = self.fc(x)
+#         return x
+
+# # ✅ Load NEW MODEL
+# model = CNN().to(device)
+# model.load_state_dict(torch.load("streetlight_multiclass.pth", map_location=device))
+# model.eval()
+
+# transform = transforms.Compose([
+#     transforms.Resize((128,128)),
+#     transforms.RandomHorizontalFlip(),
+#     transforms.RandomRotation(10),
+#     transforms.ColorJitter(brightness=0.3, contrast=0.3),
+#     transforms.ToTensor(),
+#     transforms.Normalize(
+#         mean=[0.485, 0.456, 0.406],
+#         std=[0.229, 0.224, 0.225]
+#     )
+# ])
+
+
+# # ⚠ MUST MATCH training order
+# class_names = ['Light_of', 'Light_on', 'Low', 'Physical']
+device = torch.device("cpu")
+
+# =============================
+# MODEL DEFINITION (MUST MATCH TRAINING)
 class CNN(nn.Module):
     def __init__(self):
-        super(CNN, self).__init__()
+        super().__init__()
 
         self.conv = nn.Sequential(
             nn.Conv2d(3, 32, 3, padding=1),
+            nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.MaxPool2d(2),
 
             nn.Conv2d(32, 64, 3, padding=1),
+            nn.BatchNorm2d(64),
             nn.ReLU(),
             nn.MaxPool2d(2),
 
             nn.Conv2d(64, 128, 3, padding=1),
+            nn.BatchNorm2d(128),
             nn.ReLU(),
             nn.MaxPool2d(2),
 
             nn.AdaptiveAvgPool2d((1,1))
         )
 
-        # self.fc = nn.Sequential(
-        #     nn.Flatten(),
-        #     nn.Linear(128, 128),
-        #     nn.ReLU(),
-        #     nn.Dropout(0.5),
-        #     nn.Linear(128, 4)
-        # )
         self.fc = nn.Sequential(
             nn.Flatten(),
             nn.Linear(128, 128),
             nn.ReLU(),
-            nn.Linear(128, 4)
+            nn.Dropout(0.5),
+            nn.Linear(128, 4)   # same as training
         )
 
     def forward(self, x):
         x = self.conv(x)
         x = self.fc(x)
         return x
+# =============================
+# class CNN(nn.Module):
+#     def __init__(self):
+#         super(CNN, self).__init__()
 
-# ✅ Load NEW MODEL
+#         self.conv = nn.Sequential(
+#             nn.Conv2d(3, 32, 3, padding=1),
+#             nn.ReLU(),
+#             nn.MaxPool2d(2),
+
+#             nn.Conv2d(32, 64, 3, padding=1),
+#             nn.ReLU(),
+#             nn.MaxPool2d(2),
+
+#             nn.Conv2d(64, 128, 3, padding=1),
+#             nn.ReLU(),
+#             nn.MaxPool2d(2),
+
+#             nn.AdaptiveAvgPool2d((1,1))
+#         )
+
+#         self.fc = nn.Sequential(
+#             nn.Flatten(),
+#             nn.Linear(128, 128),
+#             nn.ReLU(),
+#             nn.Linear(128, 4)   # must match training
+#         )
+
+#     def forward(self, x):
+#         x = self.conv(x)
+#         x = self.fc(x)
+#         return x
+
+# =============================
+# LOAD MODEL CORRECTLY
+# =============================
+checkpoint = torch.load("streetlight_multiclass.pth", map_location=device)
+
 model = CNN().to(device)
-model.load_state_dict(torch.load("streetlight_multiclass.pth", map_location=device))
+model.load_state_dict(checkpoint["model_state"])
 model.eval()
 
+class_names = checkpoint["class_names"]
+
+# =============================
+# TRANSFORM (NO RANDOM AUGMENT)
+# =============================
 transform = transforms.Compose([
     transforms.Resize((128,128)),
-    transforms.RandomHorizontalFlip(),
-    transforms.RandomRotation(10),
-    transforms.ColorJitter(brightness=0.3, contrast=0.3),
     transforms.ToTensor(),
     transforms.Normalize(
         mean=[0.485, 0.456, 0.406],
         std=[0.229, 0.224, 0.225]
     )
 ])
-
-
-# ⚠ MUST MATCH training order
-class_names = ["low", "Light_of", "Light_on", "physical"]
 
 # =============================
 # ROUTES
@@ -280,15 +374,29 @@ def predict_analysis():
         # CNN PREDICTION
         # =========================
         image_tensor = transform(image).unsqueeze(0).to(device)
-
         with torch.no_grad():
             output = model(image_tensor)
-            probabilities = torch.softmax(output, dim=1)
-            confidence, predicted = torch.max(probabilities, 1)
 
-        fault = class_names[predicted.item()]
+        probabilities = torch.softmax(output, dim=1)
+        confidence, predicted = torch.max(probabilities, 1)
+
+# ✅ correct class mapping
+        predicted_index = predicted.item()
+        fault = class_names[predicted_index]
+
+# ✅ confidence in %
         confidence_score = round(confidence.item() * 100, 2)
-        # =========================
+        # image_tensor = transform(image).unsqueeze(0).to(device)
+
+        # with torch.no_grad():
+        #     output = model(image_tensor)
+        #     probabilities = torch.softmax(output, dim=1)
+        #     confidence, predicted = torch.max(probabilities, 1)
+
+        # fault = class_names[predicted.item()]
+        # confidence_score = round(confidence.item() * 100, 2)
+        
+        # # =========================
         # ACTION DECISION SYSTEM
 
         if fault == "Light_on":
