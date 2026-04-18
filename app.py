@@ -38,7 +38,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500MB ALLOWED
 
 
-API_KEY = "178307af-31d5-11f1-bfb4-0200cd936042s"
+API_KEY = "178307af-31d5-11f1-bfb4-0200cd936042"
 
 # =============================
 # DATABASE CONNECTION
